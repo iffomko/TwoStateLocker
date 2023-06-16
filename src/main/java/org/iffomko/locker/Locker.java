@@ -5,11 +5,11 @@ package org.iffomko.locker;
  * У него есть два метода: один блокирует, а второй разблокирует замок.
  */
 public class Locker {
-    private final Object SYNCHRONIZED_OBJECT;
+    private final Object synchronizedObject;
     private volatile boolean isLocked;
 
     public Locker() {
-        SYNCHRONIZED_OBJECT = new Object();
+        synchronizedObject = new Object();
         isLocked = false;
     }
 
@@ -18,16 +18,17 @@ public class Locker {
      */
     public void obtainLocker() {
         while (true) {
-            synchronized (SYNCHRONIZED_OBJECT) {
+            synchronized (synchronizedObject) {
                 if (!isLocked) {
                     isLocked = true;
                     break;
                 }
 
                 try {
-                    SYNCHRONIZED_OBJECT.wait();
+                    synchronizedObject.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                    Thread.interrupted();
                 }
             }
         }
@@ -37,9 +38,9 @@ public class Locker {
      * Освобождает замок для потока
      */
     public void releaseLocker() {
-        synchronized (SYNCHRONIZED_OBJECT) {
+        synchronized (synchronizedObject) {
             isLocked = false;
-            SYNCHRONIZED_OBJECT.notify();
+            synchronizedObject.notify();
         }
     }
 }
